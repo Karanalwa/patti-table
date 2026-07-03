@@ -2,95 +2,218 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Teen Patti Manager</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Teen Patti Royale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d1117; --card: #161b22; --card2: #1c2330; --border: #2d3648;
-    --text: #e6edf3; --muted: #8b949e; --green: #2ea043; --red: #f85149;
-    --gold: #d4a017; --blue: #388bfd; --purple: #a371f7;
+    --bg: #0a0e14; --card: #12161f; --card2: #1a2030; --border: #2a3244;
+    --text: #e8edf4; --muted: #7d8797;
+    --green: #22a04a; --red: #e5484d; --blue: #3d8bfd; --purple: #a371f7;
+    --gold: #e6b942; --gold-dk: #b8860b; --felt: #0f5132;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 14px; }
-  .container { max-width: 980px; margin: 0 auto; }
-  header { text-align: center; padding: 14px 0 18px; }
-  header h1 { font-size: 1.6rem; color: var(--gold); letter-spacing: 1px; }
-  header p { color: var(--muted); font-size: .82rem; margin-top: 3px; }
-  .panel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
-  .panel h2 { font-size: .95rem; margin-bottom: 12px; color: var(--gold); }
-  input, select, button { font: inherit; border-radius: 8px; border: 1px solid var(--border); background: var(--card2); color: var(--text); padding: 9px 12px; }
-  input:focus, select:focus { outline: 1px solid var(--blue); }
-  button { cursor: pointer; font-weight: 600; border: none; transition: opacity .15s; }
-  button:hover:not(:disabled) { opacity: .85; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: radial-gradient(circle at 50% -10%, #16202e 0%, var(--bg) 55%);
+    color: var(--text); min-height: 100vh; padding: 14px;
+  }
+  .container { max-width: 1000px; margin: 0 auto; }
+
+  header { text-align: center; padding: 12px 0 18px; }
+  header h1 {
+    font-family: 'Cinzel', serif; font-size: 1.9rem; font-weight: 800;
+    background: linear-gradient(180deg, #f5d97b 20%, var(--gold-dk) 90%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+  }
+  header .sub { color: var(--muted); font-size: .78rem; letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
+  header .suits { font-size: 1rem; letter-spacing: 6px; margin-top: 2px; }
+  header .suits .r { color: var(--red); } header .suits .b { color: #cfd6e0; }
+
+  .stats { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .stat {
+    flex: 1; min-width: 100px; text-align: center; padding: 12px 8px;
+    background: linear-gradient(180deg, var(--card2), var(--card));
+    border: 1px solid var(--border); border-top: 2px solid var(--gold-dk); border-radius: 12px;
+  }
+  .stat .val { font-size: 1.25rem; font-weight: 700; color: var(--gold); }
+  .stat .lbl { font-size: .66rem; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 1px; }
+
+  .toolbar { display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 12px; flex-wrap: wrap; }
+  .toolbar button { font-size: .78rem; padding: 8px 14px; }
+
+  .panel {
+    background: linear-gradient(180deg, var(--card2) 0%, var(--card) 100%);
+    border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.35);
+  }
+  .panel h2 {
+    font-size: .82rem; margin-bottom: 12px; color: var(--gold);
+    text-transform: uppercase; letter-spacing: 2px; font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .panel h2::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+
+  input, select, button { font: inherit; border-radius: 10px; border: 1px solid var(--border); background: #0d1119; color: var(--text); padding: 10px 12px; }
+  input:focus, select:focus { outline: none; border-color: var(--gold-dk); box-shadow: 0 0 0 2px rgba(230,185,66,.15); }
+  button { cursor: pointer; font-weight: 700; border: none; transition: transform .1s, filter .15s; }
+  button:active:not(:disabled) { transform: scale(.96); }
+  button:hover:not(:disabled) { filter: brightness(1.12); }
   button:disabled { opacity: .35; cursor: not-allowed; }
-  .btn-green { background: var(--green); color: #fff; }
-  .btn-blue { background: var(--blue); color: #fff; }
-  .btn-gold { background: var(--gold); color: #14100a; }
-  .btn-purple { background: var(--purple); color: #fff; }
-  .btn-red { background: var(--red); color: #fff; }
-  .btn-outline-red { background: transparent; color: var(--red); border: 1px solid var(--red); }
+  .btn-green  { background: linear-gradient(180deg, #2cbf5b, #1c7d3b); color: #fff; box-shadow: 0 3px 10px rgba(34,160,74,.3); }
+  .btn-blue   { background: linear-gradient(180deg, #4d98ff, #2968c8); color: #fff; box-shadow: 0 3px 10px rgba(61,139,253,.3); }
+  .btn-gold   { background: linear-gradient(180deg, #f0cb5e, #c89413); color: #201603; box-shadow: 0 3px 10px rgba(230,185,66,.3); }
+  .btn-purple { background: linear-gradient(180deg, #b58aff, #7e4fd0); color: #fff; box-shadow: 0 3px 10px rgba(163,113,247,.3); }
+  .btn-red    { background: linear-gradient(180deg, #f25d61, #b82e33); color: #fff; box-shadow: 0 3px 10px rgba(229,72,77,.3); }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  .btn-outline:hover { color: var(--red); border-color: var(--red); }
+
   .row { display: flex; gap: 8px; flex-wrap: wrap; }
   .row > * { flex: 1; min-width: 100px; }
   .row > button { flex: 0 0 auto; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 740px) { .grid2 { grid-template-columns: 1fr; } }
+  .hint { font-size: .7rem; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+
   table { width: 100%; border-collapse: collapse; font-size: .86rem; }
-  th, td { padding: 7px 9px; text-align: left; border-bottom: 1px solid var(--border); }
-  th { color: var(--muted); font-weight: 600; font-size: .74rem; text-transform: uppercase; }
+  th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid rgba(42,50,68,.6); }
+  th { color: var(--muted); font-weight: 600; font-size: .68rem; text-transform: uppercase; letter-spacing: 1px; }
   tr:last-child td { border-bottom: none; }
-  .pos { color: var(--green); font-weight: 700; }
-  .neg { color: var(--red); font-weight: 700; }
-  .zero { color: var(--muted); }
-  .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .7rem; font-weight: 700; }
-  .pill.blind { background: rgba(163,113,247,.18); color: var(--purple); }
-  .pill.seen { background: rgba(56,139,253,.18); color: var(--blue); }
-  .pill.packed { background: rgba(248,81,73,.15); color: var(--red); }
-  .pill.buyin { background: rgba(56,139,253,.15); color: var(--blue); }
-  .pill.win { background: rgba(46,160,67,.15); color: var(--green); }
-  .pill.bet { background: rgba(212,160,23,.15); color: var(--gold); }
-  .pill.info { background: rgba(139,148,158,.15); color: var(--muted); }
-  .empty { color: var(--muted); font-size: .84rem; text-align: center; padding: 14px 0; }
-  .stats { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
-  .stat { flex: 1; min-width: 110px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; text-align: center; }
-  .stat .val { font-size: 1.3rem; font-weight: 700; color: var(--gold); }
-  .stat .lbl { font-size: .7rem; color: var(--muted); margin-top: 2px; text-transform: uppercase; }
-  .toolbar { display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 14px; flex-wrap: wrap; }
-  .toolbar button { font-size: .78rem; padding: 7px 14px; }
+  .pos { color: var(--green); font-weight: 700; } .neg { color: var(--red); font-weight: 700; } .zero { color: var(--muted); }
+
+  .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .66rem; font-weight: 700; letter-spacing: .5px; }
+  .pill.blind { background: rgba(163,113,247,.16); color: var(--purple); }
+  .pill.seen { background: rgba(61,139,253,.16); color: var(--blue); }
+  .pill.packed { background: rgba(229,72,77,.14); color: var(--red); }
+  .pill.buyin { background: rgba(61,139,253,.14); color: var(--blue); }
+  .pill.win { background: rgba(34,160,74,.14); color: var(--green); }
+  .pill.bet { background: rgba(230,185,66,.13); color: var(--gold); }
+  .pill.info { background: rgba(125,135,151,.13); color: var(--muted); }
+  .empty { color: var(--muted); font-size: .82rem; text-align: center; padding: 16px 0; }
+
+  /* ============ CASINO TABLE ============ */
+  .table-wrap {
+    padding: 10px; border-radius: 26px; margin-bottom: 14px;
+    background: linear-gradient(160deg, #6b4a12, #3d2a08 60%, #6b4a12);
+    box-shadow: 0 10px 34px rgba(0,0,0,.6);
+  }
+  .game-table {
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(255,255,255,.07), transparent 60%),
+      radial-gradient(ellipse at center, #157347 0%, var(--felt) 60%, #0a3b24 100%);
+    border: 2px solid rgba(230,185,66,.45); border-radius: 20px; padding: 20px 16px;
+    box-shadow: inset 0 0 60px rgba(0,0,0,.5);
+  }
+  .pot-display { text-align: center; margin-bottom: 16px; }
+  .pot-chip {
+    display: inline-block; padding: 10px 30px; border-radius: 999px;
+    background: rgba(0,0,0,.4); border: 1px dashed rgba(230,185,66,.5);
+  }
+  .pot-chip .lbl { font-size: .62rem; letter-spacing: 3px; color: #b9d8c3; text-transform: uppercase; }
+  .pot-chip .amt { font-family: 'Cinzel', serif; font-size: 2rem; font-weight: 800; color: var(--gold); text-shadow: 0 2px 10px rgba(0,0,0,.6); transition: transform .2s; }
+  .pot-chip.bump .amt { transform: scale(1.15); }
+  .stake-info { color: #b9d8c3; font-size: .76rem; margin-top: 8px; }
+  .stake-info b { color: var(--gold); }
+
+  .seats { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 16px 0; }
+  .seat {
+    position: relative; background: rgba(0,0,0,.38); border: 2px solid transparent;
+    border-radius: 14px; padding: 12px 14px 10px; min-width: 136px; text-align: center;
+    transition: border-color .2s, box-shadow .2s, opacity .2s;
+  }
+  .seat.turn { border-color: var(--gold); box-shadow: 0 0 18px rgba(230,185,66,.45); animation: glow 1.6s ease-in-out infinite; }
+  @keyframes glow { 50% { box-shadow: 0 0 28px rgba(230,185,66,.7); } }
+  .seat.packed-seat { opacity: .38; filter: grayscale(.6); }
+  .avatar {
+    width: 52px; height: 52px; border-radius: 50%; margin: 0 auto 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.9rem; line-height: 1;
+    background: radial-gradient(circle at 35% 30%, #2a3850, #141b28);
+    border: 2px solid var(--gold-dk);
+    box-shadow: 0 3px 10px rgba(0,0,0,.5);
+  }
+  /* card fan */
+  .card-fan { display: flex; justify-content: center; height: 36px; margin: 5px 0 2px; }
+  .pcard {
+    width: 23px; height: 33px; border-radius: 4px; margin: 0 -7px;
+    border: 1.5px solid #ece0c4; box-shadow: 0 2px 5px rgba(0,0,0,.45);
+    background:
+      radial-gradient(circle at 50% 50%, rgba(255,255,255,.12) 0 2px, transparent 3px),
+      repeating-linear-gradient(45deg, #8c2433 0 3px, #641623 3px 6px);
+  }
+  .pcard:nth-child(1) { transform: rotate(-14deg) translateY(3px); }
+  .pcard:nth-child(2) { transform: translateY(-2px); z-index: 1; }
+  .pcard:nth-child(3) { transform: rotate(14deg) translateY(3px); }
+  .pcard.up {
+    background: linear-gradient(160deg, #fdfaf2, #e8e2d0);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .78rem; font-weight: 800;
+  }
+  .pcard.up.rsuit { color: #c22; } .pcard.up.bsuit { color: #1a1a2a; }
+  /* chip stacks */
+  .chip-row { display: flex; justify-content: center; gap: 3px; margin-top: 5px; height: 15px; }
+  .chip {
+    width: 15px; height: 15px; border-radius: 50%;
+    border: 2px dashed rgba(255,255,255,.75);
+    box-shadow: 0 2px 3px rgba(0,0,0,.5), inset 0 0 0 2px rgba(0,0,0,.25);
+  }
+  .chip.c0 { background: #cf4444; } .chip.c1 { background: #3d8bfd; }
+  .chip.c2 { background: #22a04a; } .chip.c3 { background: #23252d; }
+  .chip.c4 { background: var(--gold); }
+  .pot-chips { display: flex; justify-content: center; gap: 4px; margin-top: 8px; }
+  .pot-chips .chip { width: 19px; height: 19px; }
+  .seat .sname { font-weight: 700; font-size: .9rem; margin-bottom: 3px; }
+  .seat .sbet { font-size: .7rem; color: #b9d8c3; margin-top: 4px; }
+  .seat .swallet { font-size: .66rem; color: #7fa38c; }
+  .dealer-chip {
+    position: absolute; top: -9px; right: -7px;
+    background: #fff; color: #111; font-size: .62rem; font-weight: 800;
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,.5); border: 2px solid var(--gold-dk);
+  }
+  .cards-back { font-size: .95rem; letter-spacing: -6px; margin-top: 2px; }
+
+  .turn-banner { text-align: center; color: #d7e8dc; font-size: .95rem; margin-bottom: 12px; }
+  .turn-banner strong { color: var(--gold); font-family: 'Cinzel', serif; letter-spacing: 1px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; }
+  .actions button { padding: 11px 18px; font-size: .88rem; border-radius: 12px; }
+  .custom-bet { display: flex; gap: 6px; align-items: center; background: rgba(0,0,0,.3); border-radius: 12px; padding: 4px; }
+  .custom-bet input { width: 92px; padding: 8px 10px; background: rgba(0,0,0,.4); border-color: rgba(230,185,66,.3); }
+  .custom-bet button { padding: 8px 14px; font-size: .8rem; }
+  .table-foot { display: flex; justify-content: center; margin-top: 12px; }
+
+  .settle-item { display: flex; align-items: center; gap: 10px; padding: 11px 14px; background: #0d1119; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; font-size: .9rem; }
+  .settle-item .arrow { color: var(--gold); font-weight: 700; }
+
+  .modal-bg { position: fixed; inset: 0; background: rgba(4,6,10,.8); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; z-index: 10; }
+  .modal-bg.show { display: flex; }
+  .modal {
+    background: linear-gradient(180deg, var(--card2), var(--card));
+    border: 1px solid rgba(230,185,66,.4); border-radius: 18px; padding: 24px; max-width: 400px; width: 92%;
+    box-shadow: 0 20px 60px rgba(0,0,0,.7); animation: pop .18s ease-out;
+  }
+  @keyframes pop { from { transform: scale(.85); opacity: 0; } }
+  .modal h3 { color: var(--gold); margin-bottom: 14px; font-size: 1.05rem; font-family: 'Cinzel', serif; }
+  .modal .choices { display: flex; flex-direction: column; gap: 9px; }
+  .modal .choices button { text-align: center; padding: 12px; font-size: .95rem; }
+  .win-big { text-align: center; font-size: 2.6rem; margin-bottom: 8px; animation: bounce .5s ease; }
+  @keyframes bounce { 0%{transform:scale(.3)} 60%{transform:scale(1.2)} 100%{transform:scale(1)} }
+
   .del { background: none; border: none; color: var(--muted); cursor: pointer; }
   .del:hover { color: var(--red); }
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } }
-
-  /* game table */
-  .game-table { background: radial-gradient(ellipse at center, #14532d 0%, #0f3d22 70%, #0a2e19 100%); border: 3px solid #7c5c10; border-radius: 16px; padding: 18px; margin-bottom: 14px; }
-  .pot-display { text-align: center; margin-bottom: 14px; }
-  .pot-display .pot-amt { font-size: 2rem; font-weight: 800; color: var(--gold); text-shadow: 0 2px 8px rgba(0,0,0,.5); }
-  .pot-display .stake-info { color: #c8e6c9; font-size: .82rem; margin-top: 2px; }
-  .seats { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 14px; }
-  .seat { background: rgba(0,0,0,.35); border: 2px solid transparent; border-radius: 12px; padding: 10px 14px; min-width: 130px; text-align: center; }
-  .seat.turn { border-color: var(--gold); box-shadow: 0 0 12px rgba(212,160,23,.4); }
-  .seat.packed-seat { opacity: .45; }
-  .seat .sname { font-weight: 700; font-size: .95rem; }
-  .seat .sbet { font-size: .75rem; color: #c8e6c9; margin-top: 3px; }
-  .seat .swallet { font-size: .72rem; color: var(--muted); }
-  .actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-  .actions button { padding: 10px 16px; font-size: .88rem; }
-  .turn-banner { text-align: center; color: #fff; font-size: .95rem; margin-bottom: 10px; }
-  .turn-banner strong { color: var(--gold); }
-  .settle-item { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--card2); border-radius: 8px; margin-bottom: 8px; font-size: .9rem; }
-  .settle-item .arrow { color: var(--gold); font-weight: 700; }
-  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: none; align-items: center; justify-content: center; z-index: 10; }
-  .modal-bg.show { display: flex; }
-  .modal { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 22px; max-width: 380px; width: 92%; }
-  .modal h3 { color: var(--gold); margin-bottom: 12px; font-size: 1.05rem; }
-  .modal .row { margin-top: 12px; }
-  .modal .choices { display: flex; flex-direction: column; gap: 8px; }
-  .modal .choices button { text-align: left; }
 </style>
 </head>
 <body>
 <div class="container">
   <header>
-    <h1>&#127183; Teen Patti Manager</h1>
-    <p>Boot &middot; Blind &middot; Chaal &middot; Pack &middot; Sideshow &middot; Show — full money tracking</p>
+    <h1>TEEN PATTI ROYALE</h1>
+    <div class="suits"><span class="b">&#9824;</span> <span class="r">&#9829;</span> <span class="b">&#9827;</span> <span class="r">&#9830;</span></div>
+    <div class="sub">Boot &middot; Blind &middot; Chaal &middot; Sideshow &middot; Show</div>
   </header>
 
   <div class="stats">
@@ -101,15 +224,17 @@
   </div>
 
   <div class="toolbar">
+    <button class="btn-outline" onclick="toggleSound()" id="soundBtn">&#128266; Sound</button>
+    <button class="btn-gold" onclick="undo()">&#8630; Undo</button>
     <button class="btn-blue" onclick="exportCSV()">Export CSV</button>
-    <button class="btn-outline-red" onclick="resetAll()">Reset Session</button>
+    <button class="btn-outline" onclick="resetAll()">Reset</button>
   </div>
 
   <!-- setup -->
   <div id="setupArea">
     <div class="grid2">
       <div class="panel">
-        <h2>&#128100; Add Player</h2>
+        <h2>&#127917; Add Player</h2>
         <div class="row">
           <input id="pName" placeholder="Name" onkeydown="if(event.key==='Enter')addPlayer()">
           <input id="pBuyin" type="number" min="0" placeholder="Buy-in (&#8377;)">
@@ -117,17 +242,18 @@
         </div>
       </div>
       <div class="panel">
-        <h2>&#9881;&#65039; Game Settings</h2>
+        <h2>&#9881;&#65039; Table Rules</h2>
         <div class="row">
-          <input id="bootAmt" type="number" min="1" value="10" placeholder="Boot (&#8377;)">
-          <input id="maxBlinds" type="number" min="0" value="4" placeholder="Max blind bets">
-          <button class="btn-gold" onclick="startRound()" id="startBtn">Start Round</button>
+          <input id="bootAmt" type="number" min="1" value="10" placeholder="Boot (&#8377;)" title="Boot amount">
+          <input id="maxBlinds" type="number" min="0" value="4" placeholder="Max blinds" title="Max blind bets (0 = unlimited)">
+          <input id="potLimit" type="number" min="0" value="0" placeholder="Pot limit (&#8377;)" title="Pot limit — forced show when reached (0 = none)">
+          <button class="btn-gold" onclick="startRound()" id="startBtn">Deal</button>
         </div>
-        <div style="font-size:.72rem;color:var(--muted);margin-top:6px">Boot collected from all at round start. Players are shuffled each round. If wallet runs short mid-round: auto top-up of the exact required amount — win to stay, lose = eliminated.</div>
+        <div class="hint">Boot from every player at deal &middot; players shuffled each round &middot; first seat holds the dealer chip &middot; pot limit forces a show when reached &middot; empty wallet mid-round auto-tops-up the exact shortfall — win to stay, lose and you're out.</div>
       </div>
     </div>
     <div class="panel">
-      <h2>&#128176; Top-up Wallet</h2>
+      <h2>&#128176; Wallet Top-up</h2>
       <div class="row">
         <select id="tPlayer"></select>
         <input id="tAmount" type="number" min="0" placeholder="Amount (&#8377;)">
@@ -137,18 +263,27 @@
   </div>
 
   <!-- game table -->
-  <div class="game-table" id="gameArea" style="display:none">
-    <div class="pot-display">
-      <div class="pot-amt" id="potAmt">&#8377;0</div>
-      <div class="stake-info" id="stakeInfo"></div>
+  <div class="table-wrap" id="gameArea" style="display:none">
+    <div class="game-table">
+      <div class="pot-display">
+        <div class="pot-chip" id="potChip">
+          <div class="lbl">Pot</div>
+          <div class="amt" id="potAmt">&#8377;0</div>
+          <div class="pot-chips" id="potChips"></div>
+        </div>
+        <div class="stake-info" id="stakeInfo"></div>
+      </div>
+      <div class="seats" id="seats"></div>
+      <div class="turn-banner" id="turnBanner"></div>
+      <div class="actions" id="actionBtns"></div>
+      <div class="table-foot">
+        <button class="btn-outline" onclick="cancelRound()" style="font-size:.72rem;padding:6px 14px">Cancel Round (refund)</button>
+      </div>
     </div>
-    <div class="seats" id="seats"></div>
-    <div class="turn-banner" id="turnBanner"></div>
-    <div class="actions" id="actionBtns"></div>
   </div>
 
   <div class="panel">
-    <h2>&#128202; Player Balances</h2>
+    <h2>&#128202; Balances</h2>
     <table>
       <thead><tr><th>Player</th><th>Buy-in</th><th>Wallet</th><th>Net</th><th></th></tr></thead>
       <tbody id="balanceBody"></tbody>
@@ -156,9 +291,19 @@
     <div class="empty" id="balanceEmpty">No players yet</div>
   </div>
 
-  <div class="panel">
-    <h2>&#129309; Settlement — Who Pays Whom</h2>
-    <div id="settlement"><div class="empty">Play rounds to see settlement</div></div>
+  <div class="grid2">
+    <div class="panel">
+      <h2>&#127942; Round History</h2>
+      <table>
+        <thead><tr><th>#</th><th>Winner</th><th>Pot</th><th>Players</th></tr></thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+      <div class="empty" id="historyEmpty">No rounds played</div>
+    </div>
+    <div class="panel">
+      <h2>&#129309; Settlement</h2>
+      <div id="settlement"><div class="empty">Play rounds to see settlement</div></div>
+    </div>
   </div>
 
   <div class="panel">
@@ -171,28 +316,70 @@
   </div>
 </div>
 
-<!-- winner modal -->
+<!-- modal -->
 <div class="modal-bg" id="modalBg">
   <div class="modal">
-    <h3 id="modalTitle">Select Winner</h3>
+    <div class="win-big" id="modalEmoji" style="display:none">&#127942;</div>
+    <h3 id="modalTitle"></h3>
     <div id="modalBody" class="choices"></div>
   </div>
 </div>
 
 <script>
 // ================= STATE =================
-let players = [];   // {name, buyin, wallet}
-let txns = [];
+let players = [];   // {name, buyin, wallet, out}
+let txns = [], rounds = [];
 let txnId = 0, roundCount = 0;
-let game = null;    // active round state
+let game = null;
 
 const $ = id => document.getElementById(id);
 const fmt = n => '₹' + Number(n).toLocaleString('en-IN');
 const findPlayer = n => players.find(p => p.name === n);
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const initials = n => n.trim().split(/\s+/).map(w => w[0]).join('').slice(0,2).toUpperCase();
+const AVATARS = ['\u{1F9D4}','\u{1F469}','\u{1F9D1}‍\u{1F9B0}','\u{1F468}‍\u{1F9B1}','\u{1F474}','\u{1F471}‍♀️','\u{1F9D1}','\u{1F468}‍\u{1F9B3}','\u{1F475}','\u{1F470}'];
+const avatarFor = name => { let h = 0; for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return AVATARS[h % AVATARS.length]; };
+function chipRow(amount, boot, cls, max) {
+  const n = Math.max(1, Math.min(max || 5, Math.ceil(amount / (boot * 2))));
+  let html = '<div class="' + cls + '">';
+  for (let i = 0; i < n; i++) html += '<span class="chip c' + (i % 5) + '"></span>';
+  return html + '</div>';
+}
 
 function logTxn(type, detail, amount) {
   txns.push({ id: ++txnId, time: new Date().toLocaleTimeString(), type, detail, amount });
+}
+
+// ================= SOUND =================
+let sound = true;
+function toggleSound() { sound = !sound; render(); }
+function beep(freq, dur) {
+  if (!sound) return;
+  try {
+    const ctx = beep.ctx || (beep.ctx = new (window.AudioContext || window.webkitAudioContext)());
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'sine'; o.frequency.value = freq || 620;
+    o.connect(g); g.connect(ctx.destination);
+    g.gain.value = .12;
+    o.start();
+    g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + (dur || .09));
+    o.stop(ctx.currentTime + (dur || .09));
+  } catch(e) {}
+  if (navigator.vibrate) navigator.vibrate(35);
+}
+function winSound() { beep(520,.12); setTimeout(()=>beep(660,.12),120); setTimeout(()=>beep(880,.2),240); }
+
+// ================= UNDO =================
+let undoStack = [];
+function snapshot() {
+  undoStack.push(JSON.stringify({ players, txns, rounds, txnId, roundCount, game }));
+  if (undoStack.length > 30) undoStack.shift();
+}
+function undo() {
+  if (!undoStack.length) return alert('Nothing to undo');
+  const d = JSON.parse(undoStack.pop());
+  players = d.players; txns = d.txns; rounds = d.rounds || []; txnId = d.txnId; roundCount = d.roundCount; game = d.game;
+  closeModal(); render();
 }
 
 // ================= SETUP =================
@@ -202,7 +389,8 @@ function addPlayer() {
   if (!name) return alert('Enter a name');
   if (findPlayer(name)) return alert('Player exists');
   if (game) return alert('Finish the current round first');
-  players.push({ name, buyin: buyin, wallet: buyin, out: false });
+  snapshot();
+  players.push({ name, buyin, wallet: buyin, out: false });
   logTxn('JOIN', name + ' joined' + (buyin ? ' with buy-in' : ''), buyin);
   $('pName').value = ''; $('pBuyin').value = '';
   render();
@@ -213,6 +401,7 @@ function addBuyin() {
   const amt = parseFloat($('tAmount').value);
   if (!name) return alert('Add a player first');
   if (!amt || amt <= 0) return alert('Enter amount');
+  snapshot();
   const p = findPlayer(name);
   p.buyin += amt; p.wallet += amt;
   if (p.out) { p.out = false; logTxn('INFO', name + ' re-joined via buy-in', 0); }
@@ -224,6 +413,7 @@ function addBuyin() {
 function removePlayer(name) {
   if (game) return alert('Finish the current round first');
   if (!confirm('Remove ' + name + '?')) return;
+  snapshot();
   players = players.filter(p => p.name !== name);
   render();
 }
@@ -233,11 +423,13 @@ function startRound() {
   if (game) return;
   const boot = parseFloat($('bootAmt').value);
   const maxBlinds = parseInt($('maxBlinds').value) || 0;
+  const potLimit = parseFloat($('potLimit').value) || 0;
   if (!boot || boot <= 0) return alert('Enter valid boot');
   const roster = players.filter(p => !p.out);
   if (roster.length < 2) return alert('Need at least 2 active players');
 
-  // shuffle seating order (Fisher-Yates)
+  snapshot();
+  // shuffle seating (Fisher-Yates); seat 0 = dealer
   for (let i = roster.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [roster[i], roster[j]] = [roster[j], roster[i]];
@@ -245,16 +437,27 @@ function startRound() {
 
   roundCount++;
   game = {
-    boot, maxBlinds,
-    stake: boot,               // current blind stake
-    pot: 0,
-    turn: 0,
+    boot, maxBlinds, potLimit,
+    stake: boot, pot: 0, turn: 0,
     seats: roster.map(p => ({ name: p.name, status: 'blind', blindCount: 0, betTotal: 0, autoTopup: false }))
   };
   game.seats.forEach(s => { ensureFunds(s, boot); pay(s, boot, 'BOOT'); });
-  logTxn('ROUND', 'Round ' + roundCount + ' started — boot ' + fmt(boot) + ' × ' + game.seats.length + ' — order: ' + game.seats.map(s=>s.name).join(' → '), game.pot);
+  logTxn('ROUND', 'Round ' + roundCount + ' — boot ' + fmt(boot) + ' × ' + game.seats.length + ' — order: ' + game.seats.map(s=>s.name).join(' → '), game.pot);
+  beep(500,.08);
   render();
 }
+
+// auto top-up exact shortfall; must win to stay
+function ensureFunds(seat, amt) {
+  const p = findPlayer(seat.name);
+  if (p.wallet >= amt) return true;
+  const topup = amt - p.wallet;
+  p.buyin += topup; p.wallet += topup;
+  seat.autoTopup = true;
+  logTxn('AUTO-TOPUP', seat.name + ' wallet short — auto top-up ' + fmt(topup) + ' (must win to stay)', topup);
+  return true;
+}
+function canAfford(amt) { return ensureFunds(cur(), amt); }
 
 function pay(seat, amt, label) {
   const p = findPlayer(seat.name);
@@ -262,6 +465,7 @@ function pay(seat, amt, label) {
   seat.betTotal += amt;
   game.pot += amt;
   if (label !== 'BOOT') logTxn('BET', seat.name + ' — ' + label + ' ' + fmt(amt) + (seat.status==='blind'?' (blind)':''), amt);
+  const pc = $('potChip'); pc.classList.remove('bump'); void pc.offsetWidth; pc.classList.add('bump');
 }
 
 const active = () => game.seats.filter(s => s.status !== 'packed');
@@ -271,71 +475,91 @@ function nextTurn() {
   if (!game) return;
   if (active().length === 1) return endRound(active()[0].name, 'last player standing');
   do { game.turn = (game.turn + 1) % game.seats.length; } while (cur().status === 'packed');
+  beep(620,.06);
   render();
 }
 
-// amounts: blind pays stake (chaal) or 2×stake (raise, new stake = 2×stake)
-// seen pays 2×stake (chaal) or 4×stake (raise, new stake = 2×stake)
+function checkPotLimit() {
+  if (!game || !game.potLimit || game.pot < game.potLimit) return false;
+  logTxn('INFO', 'Pot limit ' + fmt(game.potLimit) + ' reached — forced show', 0);
+  const names = active().map(s => s.name);
+  openModal('Pot limit reached! Who has the best hand?', names, w => endRound(w, 'won the pot-limit show'));
+  return true;
+}
+
 function amtChaal(s) { return s.status === 'blind' ? game.stake : game.stake * 2; }
 function amtRaise(s) { return s.status === 'blind' ? game.stake * 2 : game.stake * 4; }
 
-// auto top-up: if wallet can't cover the bet, add funds automatically.
-// Player must WIN the round to stay; if they lose, they're eliminated.
-function ensureFunds(seat, amt) {
-  const p = findPlayer(seat.name);
-  if (p.wallet >= amt) return true;
-  const topup = amt - p.wallet;   // top-up exactly the required amount
-  p.buyin += topup; p.wallet += topup;
-  seat.autoTopup = true;
-  logTxn('AUTO-TOPUP', seat.name + ' wallet empty — auto top-up ' + fmt(topup) + ' (must win to stay)', topup);
-  return true;
+function afterBlindBet(s) {
+  if (s.status === 'blind' && game.maxBlinds && s.blindCount >= game.maxBlinds) {
+    s.status = 'seen';
+    logTxn('INFO', s.name + ' forced seen (max blinds reached)', 0);
+  }
 }
-function canAfford(amt) { return ensureFunds(cur(), amt); }
 
 function actChaal() {
+  snapshot();
   const s = cur();
   const amt = amtChaal(s);
-  if (!canAfford(amt)) return;
-  if (s.status === 'blind') {
-    s.blindCount++;
-    pay(s, amt, 'Blind chaal');
-    if (game.maxBlinds && s.blindCount >= game.maxBlinds) { s.status = 'seen'; logTxn('INFO', s.name + ' forced seen (max blinds reached)', 0); }
-  } else {
-    pay(s, amt, 'Chaal');
-  }
+  canAfford(amt);
+  if (s.status === 'blind') { s.blindCount++; pay(s, amt, 'Blind chaal'); afterBlindBet(s); }
+  else pay(s, amt, 'Chaal');
+  if (checkPotLimit()) return;
   nextTurn();
 }
 
 function actRaise() {
+  snapshot();
   const s = cur();
   const amt = amtRaise(s);
-  if (!canAfford(amt)) return;
+  canAfford(amt);
   pay(s, amt, 'Raise');
-  if (s.status === 'blind') { s.blindCount++; game.stake = game.stake * 2; }
-  else { game.stake = game.stake * 2; }
-  if (s.status === 'blind' && game.maxBlinds && s.blindCount >= game.maxBlinds) { s.status = 'seen'; logTxn('INFO', s.name + ' forced seen (max blinds reached)', 0); }
+  game.stake = game.stake * 2;
+  if (s.status === 'blind') { s.blindCount++; afterBlindBet(s); }
+  if (checkPotLimit()) return;
+  nextTurn();
+}
+
+// custom bet: any amount between chaal and raise; stake adjusts proportionally
+function actCustom() {
+  const s = cur();
+  const amt = parseFloat($('customBet').value);
+  const lo = amtChaal(s), hi = amtRaise(s);
+  if (!amt || amt < lo || amt > hi) return alert('Bet must be between ' + fmt(lo) + ' and ' + fmt(hi));
+  snapshot();
+  canAfford(amt);
+  pay(s, amt, amt > lo ? 'Raise (custom)' : 'Chaal');
+  const newStake = s.status === 'blind' ? amt : amt / 2;
+  if (newStake > game.stake) game.stake = newStake;
+  if (s.status === 'blind') { s.blindCount++; afterBlindBet(s); }
+  if (checkPotLimit()) return;
   nextTurn();
 }
 
 function actSee() {
+  snapshot();
   const s = cur();
   s.status = 'seen';
-  logTxn('INFO', s.name + ' saw cards (now seen — chaal doubles)', 0);
+  logTxn('INFO', s.name + ' saw cards (chaal doubles)', 0);
+  beep(700,.07);
   render();
 }
 
 function actPack() {
+  snapshot();
   const s = cur();
   s.status = 'packed';
   logTxn('INFO', s.name + ' packed', 0);
+  beep(300,.1);
   nextTurn();
 }
 
 function actShow() {
   const s = cur();
   if (active().length !== 2) return alert('Show only when 2 players remain');
+  snapshot();
   const cost = s.status === 'blind' ? game.stake : game.stake * 2;
-  if (!canAfford(cost)) return;
+  canAfford(cost);
   pay(s, cost, 'Show');
   const other = active().find(x => x.name !== s.name);
   openModal('Show! Who has the better hand?', [s.name, other.name], winner => {
@@ -346,51 +570,52 @@ function actShow() {
 function actSideshow() {
   const s = cur();
   if (s.status !== 'seen') return alert('Only seen players can sideshow');
-  // previous active seen player
-  let i = game.turn, prev = null;
+  let prev = null;
   for (let k = 1; k < game.seats.length; k++) {
-    const idx = (i - k + game.seats.length) % game.seats.length;
-    const cand = game.seats[idx];
+    const cand = game.seats[(game.turn - k + game.seats.length) % game.seats.length];
     if (cand.status === 'packed') continue;
     prev = cand; break;
   }
   if (!prev || prev.status !== 'seen') return alert('Previous player must be seen for a sideshow');
   if (active().length < 3) return alert('Sideshow needs 3+ active players');
   const cost = game.stake * 2;
-  if (!canAfford(cost)) return;
   openModal(prev.name + ': accept sideshow from ' + s.name + '?', ['Accept', 'Decline'], choice => {
+    snapshot();
     if (choice === 'Decline') { logTxn('INFO', prev.name + ' declined sideshow', 0); render(); return; }
+    canAfford(cost);
     pay(s, cost, 'Sideshow');
     openModal('Sideshow: ' + s.name + ' vs ' + prev.name + ' — who loses (packs)?', [s.name, prev.name], loser => {
-      const l = game.seats.find(x => x.name === loser);
-      l.status = 'packed';
+      game.seats.find(x => x.name === loser).status = 'packed';
       logTxn('INFO', 'Sideshow: ' + loser + ' lost and packed', 0);
+      if (active().length === 1) return endRound(active()[0].name, 'last player standing');
       if (loser === s.name) nextTurn(); else render();
-      if (active().length === 1) endRound(active()[0].name, 'last player standing');
     });
   });
 }
 
 function endRound(winnerName, reason) {
-  const p = findPlayer(winnerName);
-  p.wallet += game.pot;
-  logTxn('WIN', 'Round ' + roundCount + ': ' + winnerName + ' ' + reason + ' — pot ' + fmt(game.pot), game.pot);
-  // auto-topped-up players who didn't win are eliminated
+  const pot = game.pot;
+  findPlayer(winnerName).wallet += pot;
+  logTxn('WIN', 'Round ' + roundCount + ': ' + winnerName + ' ' + reason + ' — pot ' + fmt(pot), pot);
+  rounds.push({ num: roundCount, winner: winnerName, pot, players: game.seats.map(s=>s.name).join(', ') });
   game.seats.forEach(s => {
     if (s.autoTopup && s.name !== winnerName) {
       findPlayer(s.name).out = true;
-      logTxn('OUT', s.name + ' eliminated (auto top-up & lost). Manual buy-in re-joins.', 0);
+      logTxn('OUT', s.name + ' eliminated (auto top-up & lost). Buy-in re-joins.', 0);
     }
   });
   game = null;
   closeModal();
+  winSound();
+  openModal(winnerName + ' wins ' + fmt(pot) + '!', ['Continue'], () => {}, true);
   render();
 }
 
 function cancelRound() {
   if (!confirm('Cancel round and refund all bets?')) return;
+  snapshot();
   game.seats.forEach(s => { findPlayer(s.name).wallet += s.betTotal; });
-  logTxn('INFO', 'Round ' + roundCount + ' cancelled — all bets refunded', 0);
+  logTxn('INFO', 'Round ' + roundCount + ' cancelled — refunded', 0);
   roundCount--;
   game = null;
   render();
@@ -398,9 +623,10 @@ function cancelRound() {
 
 // ================= MODAL =================
 let modalCb = null;
-function openModal(title, choices, cb) {
+function openModal(title, choices, cb, celebrate) {
   modalCb = cb;
   $('modalTitle').textContent = title;
+  $('modalEmoji').style.display = celebrate ? 'block' : 'none';
   $('modalBody').innerHTML = choices.map(c => '<button class="btn-gold" onclick="modalPick(\'' + esc(c) + '\')">' + esc(c) + '</button>').join('');
   $('modalBg').classList.add('show');
 }
@@ -425,43 +651,57 @@ function settle() {
 
 // ================= RENDER =================
 function render() {
-  $('stPlayers').textContent = players.length;
+  $('stPlayers').textContent = players.filter(p=>!p.out).length + (players.some(p=>p.out) ? '/' + players.length : '');
   $('stRounds').textContent = roundCount;
   $('stBoot').innerHTML = fmt(parseFloat($('bootAmt').value) || 0);
   $('stBuyins').innerHTML = fmt(players.reduce((s,p)=>s+p.buyin,0));
   $('tPlayer').innerHTML = players.map(p => '<option>' + esc(p.name) + '</option>').join('');
   $('startBtn').disabled = !!game;
+  $('soundBtn').innerHTML = sound ? '&#128266; Sound' : '&#128263; Muted';
 
-  // game area
   if (game) {
     $('gameArea').style.display = 'block';
     $('potAmt').innerHTML = fmt(game.pot);
     const c = cur();
-    $('stakeInfo').innerHTML = 'Current stake: ' + fmt(game.stake) + ' &middot; Blind chaal ' + fmt(game.stake) + ' &middot; Seen chaal ' + fmt(game.stake*2);
+    $('stakeInfo').innerHTML = 'Stake <b>' + fmt(game.stake) + '</b> &middot; blind ' + fmt(game.stake) + ' &middot; seen ' + fmt(game.stake*2) +
+      (game.potLimit ? ' &middot; pot limit <b>' + fmt(game.potLimit) + '</b>' : '');
+    $('potChips').innerHTML = (function(){
+      const n = Math.max(1, Math.min(7, Math.ceil(game.pot / (game.boot * 3))));
+      let h = ''; for (let i = 0; i < n; i++) h += '<span class="chip c' + (i % 5) + '"></span>'; return h;
+    })();
     $('seats').innerHTML = game.seats.map((s, i) => {
       const p = findPlayer(s.name);
       const pill = s.status === 'blind' ? '<span class="pill blind">BLIND</span>' : s.status === 'seen' ? '<span class="pill seen">SEEN</span>' : '<span class="pill packed">PACKED</span>';
-      return '<div class="seat ' + (i === game.turn && s.status !== 'packed' ? 'turn' : '') + ' ' + (s.status === 'packed' ? 'packed-seat' : '') + '">' +
+      let cards = '';
+      if (s.status === 'blind') {
+        cards = '<div class="card-fan"><div class="pcard"></div><div class="pcard"></div><div class="pcard"></div></div>';
+      } else if (s.status === 'seen') {
+        cards = '<div class="card-fan"><div class="pcard up bsuit">&#9824;</div><div class="pcard up rsuit">&#9829;</div><div class="pcard up bsuit">&#9827;</div></div>';
+      }
+      return '<div class="seat ' + (i === game.turn && s.status !== 'packed' ? 'turn' : '') + (s.status === 'packed' ? ' packed-seat' : '') + '">' +
+        (i === 0 ? '<div class="dealer-chip">D</div>' : '') +
+        '<div class="avatar">' + avatarFor(s.name) + '</div>' +
         '<div class="sname">' + esc(s.name) + '</div>' + pill +
+        cards +
+        (s.betTotal > 0 ? chipRow(s.betTotal, game.boot, 'chip-row', 5) : '') +
         '<div class="sbet">In pot: ' + fmt(s.betTotal) + '</div>' +
         '<div class="swallet">Wallet: ' + fmt(p.wallet) + '</div></div>';
     }).join('');
-    $('turnBanner').innerHTML = '<strong>' + esc(c.name) + '</strong>’s turn (' + c.status + ')';
+    $('turnBanner').innerHTML = '<strong>' + esc(c.name) + '</strong> to act (' + c.status + ')';
     const two = active().length === 2;
     let btns = '';
     btns += '<button class="btn-green" onclick="actChaal()">' + (c.status==='blind' ? 'Blind ' : 'Chaal ') + fmt(amtChaal(c)) + '</button>';
     btns += '<button class="btn-blue" onclick="actRaise()">Raise ' + fmt(amtRaise(c)) + '</button>';
-    if (c.status === 'blind') btns += '<button class="btn-purple" onclick="actSee()">See Cards</button>';
+    btns += '<span class="custom-bet"><input id="customBet" type="number" min="0" placeholder="' + amtChaal(c) + '–' + amtRaise(c) + '"><button class="btn-blue" onclick="actCustom()">Bet</button></span>';
+    if (c.status === 'blind') btns += '<button class="btn-purple" onclick="actSee()">&#128064; See</button>';
     if (c.status === 'seen' && !two) btns += '<button class="btn-purple" onclick="actSideshow()">Sideshow ' + fmt(game.stake*2) + '</button>';
     if (two) btns += '<button class="btn-gold" onclick="actShow()">Show ' + fmt(c.status==='blind' ? game.stake : game.stake*2) + '</button>';
     btns += '<button class="btn-red" onclick="actPack()">Pack</button>';
-    btns += '<button class="btn-outline-red" onclick="cancelRound()" style="margin-left:12px">Cancel Round</button>';
     $('actionBtns').innerHTML = btns;
   } else {
     $('gameArea').style.display = 'none';
   }
 
-  // balances
   $('balanceBody').innerHTML = players.map(p => {
     const n = net(p), cls = n > 0 ? 'pos' : n < 0 ? 'neg' : 'zero';
     return '<tr><td><strong>' + esc(p.name) + '</strong>' + (p.out ? ' <span class="pill packed">OUT</span>' : '') + '</td><td>' + fmt(p.buyin) + '</td><td>' + fmt(p.wallet) +
@@ -470,13 +710,16 @@ function render() {
   }).join('');
   $('balanceEmpty').style.display = players.length ? 'none' : 'block';
 
-  // settlement
+  $('historyBody').innerHTML = [...rounds].reverse().map(r =>
+    '<tr><td>' + r.num + '</td><td class="pos">' + esc(r.winner) + '</td><td>' + fmt(r.pot) + '</td><td style="font-size:.72rem;color:var(--muted)">' + esc(r.players) + '</td></tr>'
+  ).join('');
+  $('historyEmpty').style.display = rounds.length ? 'none' : 'block';
+
   const s = settle();
   $('settlement').innerHTML = s.length
-    ? s.map(x => '<div class="settle-item"><span class="neg">' + esc(x.from) + '</span><span class="arrow">&#10142; pays &#10142;</span><span class="pos">' + esc(x.to) + '</span><strong style="margin-left:auto">' + fmt(x.amt) + '</strong></div>').join('')
+    ? s.map(x => '<div class="settle-item"><span class="neg">' + esc(x.from) + '</span><span class="arrow">&#10142;</span><span class="pos">' + esc(x.to) + '</span><strong style="margin-left:auto;color:var(--gold)">' + fmt(x.amt) + '</strong></div>').join('')
     : '<div class="empty">All settled</div>';
 
-  // log
   $('logBody').innerHTML = [...txns].reverse().slice(0, 100).map(t => {
     const cls = { 'BUY-IN':'buyin','JOIN':'buyin','BET':'bet','ROUND':'bet','WIN':'win','INFO':'info','AUTO-TOPUP':'bet','OUT':'packed' }[t.type] || 'info';
     return '<tr><td>' + t.id + '</td><td>' + t.time + '</td><td><span class="pill ' + cls + '">' + t.type + '</span></td><td>' + esc(t.detail) + '</td><td>' + (t.amount ? fmt(t.amount) : '—') + '</td></tr>';
@@ -488,6 +731,8 @@ function render() {
 function exportCSV() {
   let csv = 'Player,Buy-in,Wallet,Net\n';
   players.forEach(p => { csv += [p.name, p.buyin, p.wallet, net(p)].join(',') + '\n'; });
+  csv += '\nRound,Winner,Pot,Players\n';
+  rounds.forEach(r => { csv += [r.num, r.winner, r.pot, '"' + r.players + '"'].join(',') + '\n'; });
   csv += '\nTxn,Time,Type,Detail,Amount\n';
   txns.forEach(t => { csv += [t.id, t.time, t.type, '"' + t.detail.replace(/"/g,'""') + '"', t.amount].join(',') + '\n'; });
   const a = document.createElement('a');
@@ -498,19 +743,23 @@ function exportCSV() {
 
 function resetAll() {
   if (!confirm('Reset entire session?')) return;
-  players = []; txns = []; txnId = 0; roundCount = 0; game = null;
+  players = []; txns = []; rounds = []; txnId = 0; roundCount = 0; game = null; undoStack = [];
   try { localStorage.removeItem('tpm'); } catch(e) {}
   render();
 }
 
-// ---- auto-save (survives reloads, works on iPad) ----
+// ================= PERSISTENCE =================
 function save() {
-  try { localStorage.setItem('tpm', JSON.stringify({ players, txns, txnId, roundCount, game })); } catch(e) {}
+  try { localStorage.setItem('tpm', JSON.stringify({ players, txns, rounds, txnId, roundCount, game, sound })); } catch(e) {}
 }
 (function load() {
   try {
     const d = JSON.parse(localStorage.getItem('tpm'));
-    if (d) { players = d.players || []; txns = d.txns || []; txnId = d.txnId || 0; roundCount = d.roundCount || 0; game = d.game || null; }
+    if (d) {
+      players = d.players || []; txns = d.txns || []; rounds = d.rounds || [];
+      txnId = d.txnId || 0; roundCount = d.roundCount || 0; game = d.game || null;
+      if (typeof d.sound === 'boolean') sound = d.sound;
+    }
   } catch(e) {}
 })();
 const _render = render;
@@ -521,4 +770,3 @@ render();
 </script>
 </body>
 </html>
-                                                                                                                                               
