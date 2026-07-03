@@ -1,90 +1,524 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-    <meta name="theme-color" content="#06090D" />
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teen Patti Manager</title>
+<style>
+  :root {
+    --bg: #0d1117; --card: #161b22; --card2: #1c2330; --border: #2d3648;
+    --text: #e6edf3; --muted: #8b949e; --green: #2ea043; --red: #f85149;
+    --gold: #d4a017; --blue: #388bfd; --purple: #a371f7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 14px; }
+  .container { max-width: 980px; margin: 0 auto; }
+  header { text-align: center; padding: 14px 0 18px; }
+  header h1 { font-size: 1.6rem; color: var(--gold); letter-spacing: 1px; }
+  header p { color: var(--muted); font-size: .82rem; margin-top: 3px; }
+  .panel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+  .panel h2 { font-size: .95rem; margin-bottom: 12px; color: var(--gold); }
+  input, select, button { font: inherit; border-radius: 8px; border: 1px solid var(--border); background: var(--card2); color: var(--text); padding: 9px 12px; }
+  input:focus, select:focus { outline: 1px solid var(--blue); }
+  button { cursor: pointer; font-weight: 600; border: none; transition: opacity .15s; }
+  button:hover:not(:disabled) { opacity: .85; }
+  button:disabled { opacity: .35; cursor: not-allowed; }
+  .btn-green { background: var(--green); color: #fff; }
+  .btn-blue { background: var(--blue); color: #fff; }
+  .btn-gold { background: var(--gold); color: #14100a; }
+  .btn-purple { background: var(--purple); color: #fff; }
+  .btn-red { background: var(--red); color: #fff; }
+  .btn-outline-red { background: transparent; color: var(--red); border: 1px solid var(--red); }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .row > * { flex: 1; min-width: 100px; }
+  .row > button { flex: 0 0 auto; }
+  table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+  th, td { padding: 7px 9px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: .74rem; text-transform: uppercase; }
+  tr:last-child td { border-bottom: none; }
+  .pos { color: var(--green); font-weight: 700; }
+  .neg { color: var(--red); font-weight: 700; }
+  .zero { color: var(--muted); }
+  .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .7rem; font-weight: 700; }
+  .pill.blind { background: rgba(163,113,247,.18); color: var(--purple); }
+  .pill.seen { background: rgba(56,139,253,.18); color: var(--blue); }
+  .pill.packed { background: rgba(248,81,73,.15); color: var(--red); }
+  .pill.buyin { background: rgba(56,139,253,.15); color: var(--blue); }
+  .pill.win { background: rgba(46,160,67,.15); color: var(--green); }
+  .pill.bet { background: rgba(212,160,23,.15); color: var(--gold); }
+  .pill.info { background: rgba(139,148,158,.15); color: var(--muted); }
+  .empty { color: var(--muted); font-size: .84rem; text-align: center; padding: 14px 0; }
+  .stats { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .stat { flex: 1; min-width: 110px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; text-align: center; }
+  .stat .val { font-size: 1.3rem; font-weight: 700; color: var(--gold); }
+  .stat .lbl { font-size: .7rem; color: var(--muted); margin-top: 2px; text-transform: uppercase; }
+  .toolbar { display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 14px; flex-wrap: wrap; }
+  .toolbar button { font-size: .78rem; padding: 7px 14px; }
+  .del { background: none; border: none; color: var(--muted); cursor: pointer; }
+  .del:hover { color: var(--red); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } }
 
-    <!-- Primary SEO -->
-    <title>Karan Alwa | Power Platform Developer</title>
-    <meta
-      name="description"
-      content="Karan Alwa — Microsoft Certified (PL-400) Dynamics 365 CE & Power Platform Developer building enterprise CRM solutions and AI-powered agents. C#, .NET, Power Automate, Dataverse, MCP servers."
-    />
-    <meta name="author" content="Karan Alwa" />
-    <meta name="robots" content="index, follow, max-image-preview:large" />
-    <link rel="canonical" href="https://karanalwa.vercel.app/" />
+  /* game table */
+  .game-table { background: radial-gradient(ellipse at center, #14532d 0%, #0f3d22 70%, #0a2e19 100%); border: 3px solid #7c5c10; border-radius: 16px; padding: 18px; margin-bottom: 14px; }
+  .pot-display { text-align: center; margin-bottom: 14px; }
+  .pot-display .pot-amt { font-size: 2rem; font-weight: 800; color: var(--gold); text-shadow: 0 2px 8px rgba(0,0,0,.5); }
+  .pot-display .stake-info { color: #c8e6c9; font-size: .82rem; margin-top: 2px; }
+  .seats { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 14px; }
+  .seat { background: rgba(0,0,0,.35); border: 2px solid transparent; border-radius: 12px; padding: 10px 14px; min-width: 130px; text-align: center; }
+  .seat.turn { border-color: var(--gold); box-shadow: 0 0 12px rgba(212,160,23,.4); }
+  .seat.packed-seat { opacity: .45; }
+  .seat .sname { font-weight: 700; font-size: .95rem; }
+  .seat .sbet { font-size: .75rem; color: #c8e6c9; margin-top: 3px; }
+  .seat .swallet { font-size: .72rem; color: var(--muted); }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .actions button { padding: 10px 16px; font-size: .88rem; }
+  .turn-banner { text-align: center; color: #fff; font-size: .95rem; margin-bottom: 10px; }
+  .turn-banner strong { color: var(--gold); }
+  .settle-item { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--card2); border-radius: 8px; margin-bottom: 8px; font-size: .9rem; }
+  .settle-item .arrow { color: var(--gold); font-weight: 700; }
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: none; align-items: center; justify-content: center; z-index: 10; }
+  .modal-bg.show { display: flex; }
+  .modal { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 22px; max-width: 380px; width: 92%; }
+  .modal h3 { color: var(--gold); margin-bottom: 12px; font-size: 1.05rem; }
+  .modal .row { margin-top: 12px; }
+  .modal .choices { display: flex; flex-direction: column; gap: 8px; }
+  .modal .choices button { text-align: left; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>&#127183; Teen Patti Manager</h1>
+    <p>Boot &middot; Blind &middot; Chaal &middot; Pack &middot; Sideshow &middot; Show — full money tracking</p>
+  </header>
 
-    <!-- Favicon (inline SVG monogram, v2 brand) -->
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2306090D'/%3E%3Crect x='1' y='1' width='30' height='30' rx='5' fill='none' stroke='%235AD1FF' stroke-opacity='.35'/%3E%3Ctext x='16' y='21.5' font-family='Menlo,Consolas,monospace' font-size='13' font-weight='bold' fill='%235AD1FF' text-anchor='middle'%3EKA%3C/text%3E%3C/svg%3E"
-    />
+  <div class="stats">
+    <div class="stat"><div class="val" id="stPlayers">0</div><div class="lbl">Players</div></div>
+    <div class="stat"><div class="val" id="stRounds">0</div><div class="lbl">Rounds</div></div>
+    <div class="stat"><div class="val" id="stBoot">&#8377;10</div><div class="lbl">Boot</div></div>
+    <div class="stat"><div class="val" id="stBuyins">&#8377;0</div><div class="lbl">Total Buy-ins</div></div>
+  </div>
 
-    <!-- Open Graph (LinkedIn, Facebook, Slack) -->
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Karan Alwa" />
-    <meta property="og:title" content="Karan Alwa | Power Platform Developer" />
-    <meta
-      property="og:description"
-      content="Microsoft Certified (PL-400) Dynamics 365 CE & Power Platform Developer building enterprise CRM solutions and AI-powered agents."
-    />
-    <meta property="og:url" content="https://karanalwa.vercel.app/" />
-    <meta property="og:image" content="https://karanalwa.vercel.app/images/og-image.jpg" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Karan Alwa — Power Platform Developer (PL-400 Certified)" />
+  <div class="toolbar">
+    <button class="btn-blue" onclick="exportCSV()">Export CSV</button>
+    <button class="btn-outline-red" onclick="resetAll()">Reset Session</button>
+  </div>
 
-    <!-- Twitter / X -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Karan Alwa | Power Platform Developer" />
-    <meta
-      name="twitter:description"
-      content="Microsoft Certified (PL-400) Dynamics 365 CE & Power Platform Developer building enterprise CRM solutions and AI-powered agents."
-    />
-    <meta name="twitter:image" content="https://karanalwa.vercel.app/images/og-image.jpg" />
+  <!-- setup -->
+  <div id="setupArea">
+    <div class="grid2">
+      <div class="panel">
+        <h2>&#128100; Add Player</h2>
+        <div class="row">
+          <input id="pName" placeholder="Name" onkeydown="if(event.key==='Enter')addPlayer()">
+          <input id="pBuyin" type="number" min="0" placeholder="Buy-in (&#8377;)">
+          <button class="btn-green" onclick="addPlayer()">Add</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>&#9881;&#65039; Game Settings</h2>
+        <div class="row">
+          <input id="bootAmt" type="number" min="1" value="10" placeholder="Boot (&#8377;)">
+          <input id="maxBlinds" type="number" min="0" value="4" placeholder="Max blind bets">
+          <button class="btn-gold" onclick="startRound()" id="startBtn">Start Round</button>
+        </div>
+        <div style="font-size:.72rem;color:var(--muted);margin-top:6px">Boot collected from all at round start. Players are shuffled each round. If wallet runs short mid-round: auto top-up of the exact required amount — win to stay, lose = eliminated.</div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>&#128176; Top-up Wallet</h2>
+      <div class="row">
+        <select id="tPlayer"></select>
+        <input id="tAmount" type="number" min="0" placeholder="Amount (&#8377;)">
+        <button class="btn-blue" onclick="addBuyin()">Add Buy-in</button>
+      </div>
+    </div>
+  </div>
 
-    <!-- Google Search Console verification — paste your token and uncomment:
-    <meta name="google-site-verification" content="PASTE_TOKEN_HERE" />
-    -->
+  <!-- game table -->
+  <div class="game-table" id="gameArea" style="display:none">
+    <div class="pot-display">
+      <div class="pot-amt" id="potAmt">&#8377;0</div>
+      <div class="stake-info" id="stakeInfo"></div>
+    </div>
+    <div class="seats" id="seats"></div>
+    <div class="turn-banner" id="turnBanner"></div>
+    <div class="actions" id="actionBtns"></div>
+  </div>
 
-    <!-- Structured data: tells Google this site IS Karan Alwa -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "Karan Alwa",
-      "url": "https://karanalwa.vercel.app/",
-      "image": {
-        "@type": "ImageObject",
-        "url": "https://karanalwa.vercel.app/images/karan-alwa.jpg",
-        "caption": "Karan Alwa — Dynamics 365 CE & Power Platform Developer"
-      },
-      "jobTitle": "Dynamics 365 CE & Power Platform Developer",
-      "worksFor": { "@type": "Organization", "name": "Alphavima Technologies" },
-      "alumniOf": { "@type": "CollegeOrUniversity", "name": "Bhilai Institute of Technology (BIT), Durg" },
-      "address": { "@type": "PostalAddress", "addressLocality": "Ahmedabad", "addressCountry": "IN" },
-      "email": "mailto:karanalwa0@gmail.com",
-      "sameAs": [
-        "https://linkedin.com/in/karanalwa",
-        "https://github.com/Karanalwa"
-      ],
-      "hasCredential": {
-        "@type": "EducationalOccupationalCredential",
-        "name": "Microsoft Certified: Power Platform Developer Associate (PL-400)",
-        "url": "https://learn.microsoft.com/api/credentials/share/en-gb/karanalwa-5134/C315F88131023F03?sharingId=8451B2C4B0C7EE83"
-      },
-      "knowsAbout": ["Dynamics 365 CE", "Power Platform", "Dataverse", "Power Automate", "C#", ".NET", "MCP Servers", "AI Agents"]
+  <div class="panel">
+    <h2>&#128202; Player Balances</h2>
+    <table>
+      <thead><tr><th>Player</th><th>Buy-in</th><th>Wallet</th><th>Net</th><th></th></tr></thead>
+      <tbody id="balanceBody"></tbody>
+    </table>
+    <div class="empty" id="balanceEmpty">No players yet</div>
+  </div>
+
+  <div class="panel">
+    <h2>&#129309; Settlement — Who Pays Whom</h2>
+    <div id="settlement"><div class="empty">Play rounds to see settlement</div></div>
+  </div>
+
+  <div class="panel">
+    <h2>&#128220; Transaction Log</h2>
+    <table>
+      <thead><tr><th>#</th><th>Time</th><th>Type</th><th>Detail</th><th>Amount</th></tr></thead>
+      <tbody id="logBody"></tbody>
+    </table>
+    <div class="empty" id="logEmpty">No transactions yet</div>
+  </div>
+</div>
+
+<!-- winner modal -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3 id="modalTitle">Select Winner</h3>
+    <div id="modalBody" class="choices"></div>
+  </div>
+</div>
+
+<script>
+// ================= STATE =================
+let players = [];   // {name, buyin, wallet}
+let txns = [];
+let txnId = 0, roundCount = 0;
+let game = null;    // active round state
+
+const $ = id => document.getElementById(id);
+const fmt = n => '₹' + Number(n).toLocaleString('en-IN');
+const findPlayer = n => players.find(p => p.name === n);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
+function logTxn(type, detail, amount) {
+  txns.push({ id: ++txnId, time: new Date().toLocaleTimeString(), type, detail, amount });
+}
+
+// ================= SETUP =================
+function addPlayer() {
+  const name = $('pName').value.trim();
+  const buyin = parseFloat($('pBuyin').value) || 0;
+  if (!name) return alert('Enter a name');
+  if (findPlayer(name)) return alert('Player exists');
+  if (game) return alert('Finish the current round first');
+  players.push({ name, buyin: buyin, wallet: buyin, out: false });
+  logTxn('JOIN', name + ' joined' + (buyin ? ' with buy-in' : ''), buyin);
+  $('pName').value = ''; $('pBuyin').value = '';
+  render();
+}
+
+function addBuyin() {
+  const name = $('tPlayer').value;
+  const amt = parseFloat($('tAmount').value);
+  if (!name) return alert('Add a player first');
+  if (!amt || amt <= 0) return alert('Enter amount');
+  const p = findPlayer(name);
+  p.buyin += amt; p.wallet += amt;
+  if (p.out) { p.out = false; logTxn('INFO', name + ' re-joined via buy-in', 0); }
+  logTxn('BUY-IN', name, amt);
+  $('tAmount').value = '';
+  render();
+}
+
+function removePlayer(name) {
+  if (game) return alert('Finish the current round first');
+  if (!confirm('Remove ' + name + '?')) return;
+  players = players.filter(p => p.name !== name);
+  render();
+}
+
+// ================= GAME ENGINE =================
+function startRound() {
+  if (game) return;
+  const boot = parseFloat($('bootAmt').value);
+  const maxBlinds = parseInt($('maxBlinds').value) || 0;
+  if (!boot || boot <= 0) return alert('Enter valid boot');
+  const roster = players.filter(p => !p.out);
+  if (roster.length < 2) return alert('Need at least 2 active players');
+
+  // shuffle seating order (Fisher-Yates)
+  for (let i = roster.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [roster[i], roster[j]] = [roster[j], roster[i]];
+  }
+
+  roundCount++;
+  game = {
+    boot, maxBlinds,
+    stake: boot,               // current blind stake
+    pot: 0,
+    turn: 0,
+    seats: roster.map(p => ({ name: p.name, status: 'blind', blindCount: 0, betTotal: 0, autoTopup: false }))
+  };
+  game.seats.forEach(s => { ensureFunds(s, boot); pay(s, boot, 'BOOT'); });
+  logTxn('ROUND', 'Round ' + roundCount + ' started — boot ' + fmt(boot) + ' × ' + game.seats.length + ' — order: ' + game.seats.map(s=>s.name).join(' → '), game.pot);
+  render();
+}
+
+function pay(seat, amt, label) {
+  const p = findPlayer(seat.name);
+  p.wallet -= amt;
+  seat.betTotal += amt;
+  game.pot += amt;
+  if (label !== 'BOOT') logTxn('BET', seat.name + ' — ' + label + ' ' + fmt(amt) + (seat.status==='blind'?' (blind)':''), amt);
+}
+
+const active = () => game.seats.filter(s => s.status !== 'packed');
+const cur = () => game.seats[game.turn];
+
+function nextTurn() {
+  if (!game) return;
+  if (active().length === 1) return endRound(active()[0].name, 'last player standing');
+  do { game.turn = (game.turn + 1) % game.seats.length; } while (cur().status === 'packed');
+  render();
+}
+
+// amounts: blind pays stake (chaal) or 2×stake (raise, new stake = 2×stake)
+// seen pays 2×stake (chaal) or 4×stake (raise, new stake = 2×stake)
+function amtChaal(s) { return s.status === 'blind' ? game.stake : game.stake * 2; }
+function amtRaise(s) { return s.status === 'blind' ? game.stake * 2 : game.stake * 4; }
+
+// auto top-up: if wallet can't cover the bet, add funds automatically.
+// Player must WIN the round to stay; if they lose, they're eliminated.
+function ensureFunds(seat, amt) {
+  const p = findPlayer(seat.name);
+  if (p.wallet >= amt) return true;
+  const topup = amt - p.wallet;   // top-up exactly the required amount
+  p.buyin += topup; p.wallet += topup;
+  seat.autoTopup = true;
+  logTxn('AUTO-TOPUP', seat.name + ' wallet empty — auto top-up ' + fmt(topup) + ' (must win to stay)', topup);
+  return true;
+}
+function canAfford(amt) { return ensureFunds(cur(), amt); }
+
+function actChaal() {
+  const s = cur();
+  const amt = amtChaal(s);
+  if (!canAfford(amt)) return;
+  if (s.status === 'blind') {
+    s.blindCount++;
+    pay(s, amt, 'Blind chaal');
+    if (game.maxBlinds && s.blindCount >= game.maxBlinds) { s.status = 'seen'; logTxn('INFO', s.name + ' forced seen (max blinds reached)', 0); }
+  } else {
+    pay(s, amt, 'Chaal');
+  }
+  nextTurn();
+}
+
+function actRaise() {
+  const s = cur();
+  const amt = amtRaise(s);
+  if (!canAfford(amt)) return;
+  pay(s, amt, 'Raise');
+  if (s.status === 'blind') { s.blindCount++; game.stake = game.stake * 2; }
+  else { game.stake = game.stake * 2; }
+  if (s.status === 'blind' && game.maxBlinds && s.blindCount >= game.maxBlinds) { s.status = 'seen'; logTxn('INFO', s.name + ' forced seen (max blinds reached)', 0); }
+  nextTurn();
+}
+
+function actSee() {
+  const s = cur();
+  s.status = 'seen';
+  logTxn('INFO', s.name + ' saw cards (now seen — chaal doubles)', 0);
+  render();
+}
+
+function actPack() {
+  const s = cur();
+  s.status = 'packed';
+  logTxn('INFO', s.name + ' packed', 0);
+  nextTurn();
+}
+
+function actShow() {
+  const s = cur();
+  if (active().length !== 2) return alert('Show only when 2 players remain');
+  const cost = s.status === 'blind' ? game.stake : game.stake * 2;
+  if (!canAfford(cost)) return;
+  pay(s, cost, 'Show');
+  const other = active().find(x => x.name !== s.name);
+  openModal('Show! Who has the better hand?', [s.name, other.name], winner => {
+    endRound(winner, 'won the show vs ' + (winner === s.name ? other.name : s.name));
+  });
+}
+
+function actSideshow() {
+  const s = cur();
+  if (s.status !== 'seen') return alert('Only seen players can sideshow');
+  // previous active seen player
+  let i = game.turn, prev = null;
+  for (let k = 1; k < game.seats.length; k++) {
+    const idx = (i - k + game.seats.length) % game.seats.length;
+    const cand = game.seats[idx];
+    if (cand.status === 'packed') continue;
+    prev = cand; break;
+  }
+  if (!prev || prev.status !== 'seen') return alert('Previous player must be seen for a sideshow');
+  if (active().length < 3) return alert('Sideshow needs 3+ active players');
+  const cost = game.stake * 2;
+  if (!canAfford(cost)) return;
+  openModal(prev.name + ': accept sideshow from ' + s.name + '?', ['Accept', 'Decline'], choice => {
+    if (choice === 'Decline') { logTxn('INFO', prev.name + ' declined sideshow', 0); render(); return; }
+    pay(s, cost, 'Sideshow');
+    openModal('Sideshow: ' + s.name + ' vs ' + prev.name + ' — who loses (packs)?', [s.name, prev.name], loser => {
+      const l = game.seats.find(x => x.name === loser);
+      l.status = 'packed';
+      logTxn('INFO', 'Sideshow: ' + loser + ' lost and packed', 0);
+      if (loser === s.name) nextTurn(); else render();
+      if (active().length === 1) endRound(active()[0].name, 'last player standing');
+    });
+  });
+}
+
+function endRound(winnerName, reason) {
+  const p = findPlayer(winnerName);
+  p.wallet += game.pot;
+  logTxn('WIN', 'Round ' + roundCount + ': ' + winnerName + ' ' + reason + ' — pot ' + fmt(game.pot), game.pot);
+  // auto-topped-up players who didn't win are eliminated
+  game.seats.forEach(s => {
+    if (s.autoTopup && s.name !== winnerName) {
+      findPlayer(s.name).out = true;
+      logTxn('OUT', s.name + ' eliminated (auto top-up & lost). Manual buy-in re-joins.', 0);
     }
-    </script>
+  });
+  game = null;
+  closeModal();
+  render();
+}
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+function cancelRound() {
+  if (!confirm('Cancel round and refund all bets?')) return;
+  game.seats.forEach(s => { findPlayer(s.name).wallet += s.betTotal; });
+  logTxn('INFO', 'Round ' + roundCount + ' cancelled — all bets refunded', 0);
+  roundCount--;
+  game = null;
+  render();
+}
+
+// ================= MODAL =================
+let modalCb = null;
+function openModal(title, choices, cb) {
+  modalCb = cb;
+  $('modalTitle').textContent = title;
+  $('modalBody').innerHTML = choices.map(c => '<button class="btn-gold" onclick="modalPick(\'' + esc(c) + '\')">' + esc(c) + '</button>').join('');
+  $('modalBg').classList.add('show');
+}
+function modalPick(v) { const cb = modalCb; modalCb = null; $('modalBg').classList.remove('show'); cb && cb(v); }
+function closeModal() { modalCb = null; $('modalBg').classList.remove('show'); }
+
+// ================= SETTLEMENT =================
+const net = p => p.wallet - p.buyin;
+function settle() {
+  const cr = players.filter(p => net(p) > .005).map(p => ({ name: p.name, amt: net(p) })).sort((a,b)=>b.amt-a.amt);
+  const db = players.filter(p => net(p) < -.005).map(p => ({ name: p.name, amt: -net(p) })).sort((a,b)=>b.amt-a.amt);
+  const out = []; let i = 0, j = 0;
+  while (i < db.length && j < cr.length) {
+    const pay = Math.min(db[i].amt, cr[j].amt);
+    out.push({ from: db[i].name, to: cr[j].name, amt: pay });
+    db[i].amt -= pay; cr[j].amt -= pay;
+    if (db[i].amt < .005) i++;
+    if (cr[j].amt < .005) j++;
+  }
+  return out;
+}
+
+// ================= RENDER =================
+function render() {
+  $('stPlayers').textContent = players.length;
+  $('stRounds').textContent = roundCount;
+  $('stBoot').innerHTML = fmt(parseFloat($('bootAmt').value) || 0);
+  $('stBuyins').innerHTML = fmt(players.reduce((s,p)=>s+p.buyin,0));
+  $('tPlayer').innerHTML = players.map(p => '<option>' + esc(p.name) + '</option>').join('');
+  $('startBtn').disabled = !!game;
+
+  // game area
+  if (game) {
+    $('gameArea').style.display = 'block';
+    $('potAmt').innerHTML = fmt(game.pot);
+    const c = cur();
+    $('stakeInfo').innerHTML = 'Current stake: ' + fmt(game.stake) + ' &middot; Blind chaal ' + fmt(game.stake) + ' &middot; Seen chaal ' + fmt(game.stake*2);
+    $('seats').innerHTML = game.seats.map((s, i) => {
+      const p = findPlayer(s.name);
+      const pill = s.status === 'blind' ? '<span class="pill blind">BLIND</span>' : s.status === 'seen' ? '<span class="pill seen">SEEN</span>' : '<span class="pill packed">PACKED</span>';
+      return '<div class="seat ' + (i === game.turn && s.status !== 'packed' ? 'turn' : '') + ' ' + (s.status === 'packed' ? 'packed-seat' : '') + '">' +
+        '<div class="sname">' + esc(s.name) + '</div>' + pill +
+        '<div class="sbet">In pot: ' + fmt(s.betTotal) + '</div>' +
+        '<div class="swallet">Wallet: ' + fmt(p.wallet) + '</div></div>';
+    }).join('');
+    $('turnBanner').innerHTML = '<strong>' + esc(c.name) + '</strong>’s turn (' + c.status + ')';
+    const two = active().length === 2;
+    let btns = '';
+    btns += '<button class="btn-green" onclick="actChaal()">' + (c.status==='blind' ? 'Blind ' : 'Chaal ') + fmt(amtChaal(c)) + '</button>';
+    btns += '<button class="btn-blue" onclick="actRaise()">Raise ' + fmt(amtRaise(c)) + '</button>';
+    if (c.status === 'blind') btns += '<button class="btn-purple" onclick="actSee()">See Cards</button>';
+    if (c.status === 'seen' && !two) btns += '<button class="btn-purple" onclick="actSideshow()">Sideshow ' + fmt(game.stake*2) + '</button>';
+    if (two) btns += '<button class="btn-gold" onclick="actShow()">Show ' + fmt(c.status==='blind' ? game.stake : game.stake*2) + '</button>';
+    btns += '<button class="btn-red" onclick="actPack()">Pack</button>';
+    btns += '<button class="btn-outline-red" onclick="cancelRound()" style="margin-left:12px">Cancel Round</button>';
+    $('actionBtns').innerHTML = btns;
+  } else {
+    $('gameArea').style.display = 'none';
+  }
+
+  // balances
+  $('balanceBody').innerHTML = players.map(p => {
+    const n = net(p), cls = n > 0 ? 'pos' : n < 0 ? 'neg' : 'zero';
+    return '<tr><td><strong>' + esc(p.name) + '</strong>' + (p.out ? ' <span class="pill packed">OUT</span>' : '') + '</td><td>' + fmt(p.buyin) + '</td><td>' + fmt(p.wallet) +
+      '</td><td class="' + cls + '">' + (n >= 0 ? '+' : '−') + fmt(Math.abs(n)) +
+      '</td><td>' + (game ? '' : '<button class="del" onclick="removePlayer(\'' + esc(p.name) + '\')">&#10005;</button>') + '</td></tr>';
+  }).join('');
+  $('balanceEmpty').style.display = players.length ? 'none' : 'block';
+
+  // settlement
+  const s = settle();
+  $('settlement').innerHTML = s.length
+    ? s.map(x => '<div class="settle-item"><span class="neg">' + esc(x.from) + '</span><span class="arrow">&#10142; pays &#10142;</span><span class="pos">' + esc(x.to) + '</span><strong style="margin-left:auto">' + fmt(x.amt) + '</strong></div>').join('')
+    : '<div class="empty">All settled</div>';
+
+  // log
+  $('logBody').innerHTML = [...txns].reverse().slice(0, 100).map(t => {
+    const cls = { 'BUY-IN':'buyin','JOIN':'buyin','BET':'bet','ROUND':'bet','WIN':'win','INFO':'info','AUTO-TOPUP':'bet','OUT':'packed' }[t.type] || 'info';
+    return '<tr><td>' + t.id + '</td><td>' + t.time + '</td><td><span class="pill ' + cls + '">' + t.type + '</span></td><td>' + esc(t.detail) + '</td><td>' + (t.amount ? fmt(t.amount) : '—') + '</td></tr>';
+  }).join('');
+  $('logEmpty').style.display = txns.length ? 'none' : 'block';
+}
+
+// ================= EXPORT / RESET =================
+function exportCSV() {
+  let csv = 'Player,Buy-in,Wallet,Net\n';
+  players.forEach(p => { csv += [p.name, p.buyin, p.wallet, net(p)].join(',') + '\n'; });
+  csv += '\nTxn,Time,Type,Detail,Amount\n';
+  txns.forEach(t => { csv += [t.id, t.time, t.type, '"' + t.detail.replace(/"/g,'""') + '"', t.amount].join(',') + '\n'; });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = 'teen-patti-session.csv';
+  a.click();
+}
+
+function resetAll() {
+  if (!confirm('Reset entire session?')) return;
+  players = []; txns = []; txnId = 0; roundCount = 0; game = null;
+  try { localStorage.removeItem('tpm'); } catch(e) {}
+  render();
+}
+
+// ---- auto-save (survives reloads, works on iPad) ----
+function save() {
+  try { localStorage.setItem('tpm', JSON.stringify({ players, txns, txnId, roundCount, game })); } catch(e) {}
+}
+(function load() {
+  try {
+    const d = JSON.parse(localStorage.getItem('tpm'));
+    if (d) { players = d.players || []; txns = d.txns || []; txnId = d.txnId || 0; roundCount = d.roundCount || 0; game = d.game || null; }
+  } catch(e) {}
+})();
+const _render = render;
+render = function() { _render(); save(); };
+
+$('bootAmt').addEventListener('input', render);
+render();
+</script>
+</body>
 </html>
+                                                                                                                                               
